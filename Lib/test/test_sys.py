@@ -107,6 +107,94 @@ class ExceptHookTest(unittest.TestCase):
     # FIXME: testing the code for a lost or replaced excepthook in
     # Python/pythonrun.c::PyErr_PrintEx() is tricky.
 
+    # These are tests for the implementation of PEP 534.
+    def test_extern_module_not_found(self):
+        fake_module = "__not_a_real_module"
+        e = ModuleNotFoundError(
+            f"No module named {fake_module!r}", name=fake_module)
+
+        with support.captured_stderr() as stderr:
+            sys.excepthook(ModuleNotFoundError, e, "traceback")
+
+        self.assertEqual(
+            f"ModuleNotFoundError: No module named {fake_module!r}\n",
+            stderr.getvalue(),
+        )
+
+    def test_builtin_module_not_found(self):
+        fake_builtin = "ensurepip2"
+        sysconfig._BUILTIN_MODULES.add(fake_builtin)
+        e = ModuleNotFoundError(
+            f"No module named {fake_builtin!r}",
+            name=fake_builtin,
+        )
+
+        with support.captured_stderr() as stderr:
+            sys.excepthook(ModuleNotFoundError, e, "traceback")
+
+        sysconfig._BUILTIN_MODULES.remove(fake_builtin)
+        self.assertEqual(
+            f"ModuleNotFoundError: Standard library module {fake_builtin!r}"
+             " was not found\n",
+            stderr.getvalue(),
+        )
+
+    def test_builtin_submodule_not_found(self):
+        fake_builtin = "ensurepip2"
+        fake_submodule = f"{fake_builtin}.xml"
+        sysconfig._BUILTIN_MODULES.add(fake_builtin)
+        e = ModuleNotFoundError(
+            f"No module named {fake_submodule!r}",
+            name=fake_submodule,
+        )
+
+        with support.captured_stderr() as stderr:
+            sys.excepthook(ModuleNotFoundError, e, "traceback")
+
+        sysconfig._BUILTIN_MODULES.remove(fake_builtin)
+        self.assertEqual(
+            f"ModuleNotFoundError: No submodule named {fake_submodule!r}"
+            f" in standard library module {fake_builtin!r}\n",
+            stderr.getvalue(),
+        )
+
+    def test_optional_module_not_found(self):
+        fake_optional = "optional"
+        sysconfig._OPTIONAL_MODULES.add(fake_optional)
+        e = ModuleNotFoundError(
+            f"No module named {fake_optional!r}",
+            name=fake_optional,
+        )
+
+        with support.captured_stderr() as stderr:
+            sys.excepthook(ModuleNotFoundError, e, "traceback")
+
+        sysconfig._OPTIONAL_MODULES.remove(fake_optional)
+        self.assertEqual(
+            "ModuleNotFoundError: Optional standard library module"
+            f" {fake_optional!r} was not found\n",
+            stderr.getvalue(),
+        )
+
+    def test_optional_submodule_not_found(self):
+        fake_optional = "ensurepip2"
+        fake_submodule = f"{fake_optional}.xml"
+        sysconfig._OPTIONAL_MODULES.add(fake_optional)
+        e = ModuleNotFoundError(
+            f"No module named {fake_submodule!r}",
+            name=fake_submodule,
+        )
+
+        with support.captured_stderr() as stderr:
+            sys.excepthook(ModuleNotFoundError, e, "traceback")
+
+        sysconfig._OPTIONAL_MODULES.remove(fake_optional)
+        self.assertEqual(
+            f"ModuleNotFoundError: No submodule named {fake_submodule!r} in"
+            f" optional standard library module {fake_optional!r}\n",
+            stderr.getvalue(),
+        )
+
 
 class SysModuleTest(unittest.TestCase):
 

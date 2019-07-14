@@ -298,6 +298,10 @@ always available.
 
    This function prints out a given traceback and exception to ``sys.stderr``.
 
+   The traceback message is modified appropriately, when it detects failure to
+   import a module belonging to the Python standard library. For more
+   information, please see PEP 534.
+
    When an exception is raised and uncaught, the interpreter calls
    ``sys.excepthook`` with three arguments, the exception class, exception
    instance, and a traceback object.  In an interactive session this happens just

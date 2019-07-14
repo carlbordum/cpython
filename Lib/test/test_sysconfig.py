@@ -386,6 +386,17 @@ class TestSysConfig(unittest.TestCase):
         suffix = sysconfig.get_config_var('EXT_SUFFIX')
         self.assertTrue(suffix.endswith('-darwin.so'), suffix)
 
+    def test_optional_modules_subset_of_all_modules(self):
+        all_modules = sysconfig.get_stdlib_modules()
+        optional_modules = sysconfig.get_optional_modules()
+        self.assertTrue(all_modules.issuperset(optional_modules))
+
+    def test_builtin_modules_subset_of_all_modules(self):
+        all_modules = sysconfig.get_stdlib_modules()
+        builtin_modules = set(sys.builtin_module_names)
+        self.assertTrue(all_modules.issuperset(builtin_modules))
+
+
 class MakefileTests(unittest.TestCase):
 
     @unittest.skipIf(sys.platform.startswith('win'),

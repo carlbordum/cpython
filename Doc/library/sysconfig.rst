@@ -17,8 +17,8 @@
 --------------
 
 The :mod:`sysconfig` module provides access to Python's configuration
-information like the list of installation paths and the configuration variables
-relevant for the current platform.
+information like the list of installation paths, the configuration variables
+relevant for the current platform and the list of standard library modules.
 
 Configuration variables
 -----------------------
@@ -156,6 +156,25 @@ identifier.  Python currently uses eight paths:
 
    If *scheme* is not an existing scheme, :func:`get_paths` will raise a
    :exc:`KeyError`.
+
+
+Standard library
+----------------
+
+:mod:`sysconfig` provides two functions to identify modules belonging to the
+Python standard library.
+
+.. function:: get_stdlib_modules()
+
+    Return set of all top level standard library module names.
+
+
+.. function:: get_optional_modules()
+
+    Return set of all optional top level standard library module names.
+
+    Optional modules may be optional build dependencies, platform specific or
+    otherwise not available on all distributions.
 
 
 Other functions

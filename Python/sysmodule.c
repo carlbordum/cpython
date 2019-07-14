@@ -695,6 +695,7 @@ sys_excepthook_impl(PyObject *module, PyObject *exctype, PyObject *value,
                     PyObject *traceback)
 /*[clinic end generated code: output=18d99fdda21b6b5e input=ecf606fa826f19d9]*/
 {
+    // CHANGE DEFAULT HERE?
     PyErr_Display(exctype, value, traceback);
     Py_RETURN_NONE;
 }
