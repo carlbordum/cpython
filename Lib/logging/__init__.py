@@ -23,7 +23,7 @@ Copyright (C) 2001-2019 Vinay Sajip. All Rights Reserved.
 To use, simply 'import logging' and log away!
 """
 
-import sys, os, time, io, re, traceback, warnings, weakref, collections.abc
+import asyncio, sys, os, time, io, re, traceback, warnings, weakref, collections.abc
 
 from types import GenericAlias
 from string import Template
@@ -77,6 +77,12 @@ logMultiprocessing = True
 # If you don't want process information in the log, set this to zero
 #
 logProcesses = True
+
+#
+# If you don't want asyncio.Task information in the log, set this to zero
+#
+logAsyncioTasks = True
+
 
 #---------------------------------------------------------------------------
 #   Level related stuff
@@ -360,6 +366,8 @@ class LogRecord(object):
             self.process = os.getpid()
         else:
             self.process = None
+        if logAsyncioTasks:
+            self.taskname = asyncio.current_task().get_name()
 
     def __repr__(self):
         return '<LogRecord: %s, %s, %s, %s, "%s">'%(self.name, self.levelno,
